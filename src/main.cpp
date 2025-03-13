@@ -24,66 +24,40 @@
 // 01 - Game loop with time code
 */
 
+typedef enum ObjectTypes { PLAYER, NPC };
+
 constexpr int SCREEN_WIDTH = 800;
 constexpr int SCREEN_HEIGHT = 450;
 
 constexpr int FPS = 60;
 
-constexpr int PLAYER_SPEED = 300;
+constexpr int OBJECT_SPEED = 300;
 
 constexpr Vector2 OBJECT_SIZE = {30, 30};
 
-    //very, very temporary. Goes through map data and as soon is it sees floor, it spawns an object.
-void spawnObjectOnMap(ObjectHandler& handler, Floor& floor, char objectType = 'p')
-{
-    bool objectSpawned = false;
-
-    for (int y = 0; y < HEIGHT; y++)
-    {
-        for (int x = 0; x < WIDTH; x++)
-        {
-            if (floor.data[x][y] == FLOOR && !objectSpawned)
-            {
-                objectSpawned = true;
-
-                switch (objectType)
-                {
-                case 'p':
-                    handler.createPlayer({ (float)x * TILE_SIZE, (float)y * TILE_SIZE }, { 30, 30 }, PLAYER_SPEED);
-                    break;
-                default:
-                    break;
-                }
-
-                break;
-            }
-        }
-    }
-}
+//this is bad
+void spawnObjectOnMap(ObjectHandler& handler, Floor& floor, ObjectTypes type);
 
 int main() 
 {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "noeRouge alpha v0.1");
     SetTargetFPS(FPS);
 
-        // Create the objectHandler
-    class ObjectHandler objectHandler;
-    class GameObject *testObject;
-
-        // Create floor
-    Floor floor = Floor('r');
-    std::vector<Rectangle> collidables = floor.getNearCollidables();
-    spawnObjectOnMap(objectHandler, floor);
-
-        // Print version info
+    // Print version info
     std::cout << "noeRouge alpha v0.1\n";
 
-        // Test object creation
+    srand(time(0));
 
-        // Create a player so we can see it tick, and see it on screen
-    objectHandler.createNPC({ 300, 300 }, { 30, 30 }, 200);
+        // Create the objectHandler
+    class ObjectHandler objectHandler;
 
-        // driver code - just for testing before real driver code
+        // Create floor, spawn objects in relation to it
+    Floor floor = Floor('r');
+    std::vector<Rectangle> collidables = floor.getNearCollidables();
+    spawnObjectOnMap(objectHandler, floor, PLAYER);
+    spawnObjectOnMap(objectHandler, floor, NPC);
+
+        // driver code - just for testing before real driver and drawing code
     while (!WindowShouldClose())
     {
         objectHandler.tickAll(floor);
@@ -93,8 +67,9 @@ int main()
         ClearBackground(BLACK);
 
         objectHandler.renderAll();
-
-        for (Rectangle rect : floor.getNearCollidables())
+            
+            //temporary until render code
+        for (Rectangle rect : collidables)
         {
             DrawRectangle(rect.x, rect.y, rect.width, rect.height, BLUE);
         }
@@ -102,16 +77,36 @@ int main()
         EndDrawing();
     }
 
-    // TODO 01
-    /*
-    while (isGameRunning) {
-        time stuff
+        //TODO - Deallocate memory
 
-        if (tick) {
-            objectHandler.tickAll();
-        }
-    }
-    */
+    CloseWindow();
 
     return 0;
+}
+
+//very, very temporary. Goes through map data and as soon is it sees floor, it spawns an object.
+void spawnObjectOnMap(ObjectHandler& handler, Floor& floor, ObjectTypes type)
+{
+    for (int y = 0; y < HEIGHT; y++)
+    {
+        for (int x = 0; x < WIDTH; x++)
+        {
+            if (floor.data[x][y] == FLOOR)
+            {
+                switch (type)
+                {
+                case PLAYER:
+                    handler.createPlayer({ (float)x * TILE_SIZE, (float)y * TILE_SIZE }, OBJECT_SIZE, OBJECT_SPEED);
+                    break;
+                case NPC:
+                    handler.createNPC({ (float)x * TILE_SIZE, (float)y * TILE_SIZE }, OBJECT_SIZE, OBJECT_SPEED);
+                    break;
+                default:
+                    break;
+                }
+
+                return;
+            }
+        }
+    }
 }
