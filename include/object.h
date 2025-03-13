@@ -17,10 +17,19 @@ class GameObject
 private:
     int id;
     int speed;
-    Vector2 position;
     Vector2 size;
 
-    //Checks if this character is colliding with the left side of another rectangle, same for all colliding functions.
+    /*------------------------------------------------------------------------------------------------------------------------------------------
+    * Ben Aguilon.
+    * @brief : Creates an NPC object of an input size at an input position with an input speed.
+    *
+    * @param Rectangle other : The other rectangle, which acts as a collider which collides with this rectangle.
+    * @param Vector2 _position : NPC's starting position.
+    * @param Vector2 _size : NPC's starting size.
+    * @param int _speed : NPC's starting speed value.
+    *
+    * @return : none
+    */
     bool collidingLeft(Rectangle other);
 
     bool collidingRight(Rectangle other);
@@ -32,6 +41,7 @@ private:
     void updateCollisions(const std::vector<Rectangle> colliders);
 
 protected:
+    Vector2 position;
     Vector2 direction;
     Vector2 velocity;
 
@@ -45,7 +55,10 @@ public:
         // No memory is currently allocated, do nothing
     }
 
-    // Getters
+    /*------------------------------------------------------------------------------------------------------------------------------------------
+          * Ethan Sheffield, Ben Aguilon
+          * @brief Getters for the GameObject class.
+          */
     int getId();
 
     Rectangle getBounds();
@@ -54,7 +67,10 @@ public:
 
     Vector2 getDirection();
 
-    // Setters
+    /*------------------------------------------------------------------------------------------------------------------------------------------
+          * Ben Aguilon
+          * @brief Setters for the GameObject class.
+          */
     void setPosition(Vector2 _position);
 
     virtual void onTick(Floor floor);
